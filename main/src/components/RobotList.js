@@ -1,40 +1,28 @@
-import React, { Component } from 'react'
+import { useEffect, useState } from 'react'
 import RobotStore from '../stores/RobotStore'
 import Robot from './Robot'
 import RobotForm from './RobotForm'
 
+function RobotList () {
+	const [robots, setRobots] = useState([])
+	const store = new RobotStore()
 
-
-class RobotList extends Component {
-	constructor(){
-		super()
-		this.state = {
-			robots : []
-		}
-	}
-	componentDidMount(){
-		this.store = new RobotStore()
-		this.setState({
-			robots : this.store.getRobots()
+	useEffect(() => {
+		setRobots(store.getRobots())
+		store.emitter.addListener('UPDATE', () => {
+			setRobots(store.getRobots())
 		})
-		this.store.emitter.addListener('UPDATE', () => {
-			this.setState({
-				robots : this.store.getRobots()
-			})			
-		})
-	}
-	render() {
-		return (
-			<div>
-				 
-				{
-					this.state.robots.map((e, i) => 
-						<Robot item={e} key={i} />
-					)
-				}
-			</div>
-		)
-	}
+	}, [])
+	
+	return (
+		<div>				 
+			{
+				robots.map((e, i) => 
+					<Robot item={e} key={i} />
+				)
+			}
+		</div>
+	)
 }
 
 export default RobotList
