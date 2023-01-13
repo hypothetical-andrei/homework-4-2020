@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import RobotStore from '../stores/RobotStore'
+import store from '../stores/RobotStore'
 import Robot from './Robot'
 import RobotForm from './RobotForm'
 
 function RobotList () {
 	const [robots, setRobots] = useState([])
-	const store = new RobotStore()
 
 	useEffect(() => {
 		setRobots(store.getRobots())

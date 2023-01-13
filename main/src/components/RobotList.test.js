@@ -1,53 +1,48 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import RobotList from './RobotList'
-import Robot from './Robot'
 import RobotForm from './RobotForm'
-import { shallow, mount, render, configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-
-configure({ adapter: new Adapter() })
+import { fireEvent, render, screen } from '@testing-library/react';
+import App from './App'
 
 it ('renders a robot form', () => {
-	const component = mount(<RobotList />)
-	expect(component.find(RobotForm).length).toEqual(1)	
+	const app = render(<App />)
+	const forms = app.getAllByText('Robot form')
+	expect(forms.length).toEqual(1)	
 })
 
-it ('valid props on robot form', () => {
-	const component = mount(<RobotList />)
-	let form = component.find(RobotForm).first()
-	expect(typeof form.props().onAdd).toEqual('function')
+it ('form contains valid inputs', () => {
+	const container = render(<RobotForm />)
+	const inputName = container.getByRole('textbox', {name: /name/i})
+	const inputType = container.getByRole('textbox', {name: /type/i})
+	const inputMass = container.getByRole('textbox', {name: /mass/i})
+	expect(inputName).toBeTruthy()
+	expect(inputType).toBeTruthy()
+	expect(inputMass).toBeTruthy()
 })
 
 it ('add a robot and it exists on the page', () => {
-	const component = mount(<RobotList />)
-	let form = component.find(RobotForm).first()
-	let nameInput = component.find('#name').first()
-	nameInput.value = 'test_name'
-	let typeInput = component.find('#type').first()
-	typeInput.value = 'test_type'
-	let massInput = component.find('#mass').first()
-	massInput.value = 'test_mass'	
-	let button = form.find('[value="add"]').first()
-	button.simulate('click')
-	expect(component.find(Robot).length).toEqual(3)	
+	const container = render(<App />)
+	const inputName = container.getByRole('textbox', {name: /name/i})
+	const inputType = container.getByRole('textbox', {name: /type/i})
+	const inputMass = container.getByRole('textbox', {name: /mass/i})
+	fireEvent.change(inputName, { target: { value: 'test' } })
+	fireEvent.change(inputType, { target: { value: 'engineer' } })
+	fireEvent.change(inputMass, { target: { value: '1000' } })
+	const addButton = container.getByRole('button')
+	fireEvent.click(addButton)
+	const renderedItem = container.getByText(/test/)
+	expect(renderedItem).toBeTruthy()
 })
 
-it ('correct robot', () => {
-	const component = mount(<RobotList />)
-	let form = component.find(RobotForm).first()
-	let nameInput = component.find('#name').first()
-	nameInput.simulate('focus')
-	nameInput.simulate('change', { target: { name : 'name', value: 'test_name' } })
-	let typeInput = component.find('#type').first()
-	typeInput.simulate('focus')
-	typeInput.simulate('change', { target: {name : 'type', value: 'test_type' } })
-	let massInput = component.find('#mass').first()
-	massInput.simulate('focus')
-	massInput.simulate('change', { target: { name : 'mass', value: 'test_mass' } })
-	let button = form.find('[value="add"]').first()
-	button.simulate('click')
-	let robot = component.find(Robot).last()
-	expect(robot.props().item).toEqual({id: 3, name : 'test_name', type : 'test_type', mass: 'test_mass'})	
+it ('form is reset', () => {
+	const container = render(<App />)
+	const inputName = container.getByRole('textbox', {name: /name/i})
+	const inputType = container.getByRole('textbox', {name: /type/i})
+	const inputMass = container.getByRole('textbox', {name: /mass/i})
+	fireEvent.change(inputName, { target: { value: 'test' } })
+	fireEvent.change(inputType, { target: { value: 'engineer' } })
+	fireEvent.change(inputMass, { target: { value: '1000' } })
+	const addButton = container.getByRole('button')
+	fireEvent.click(addButton)
+	expect(inputName.value).toEqual('')
 })
 

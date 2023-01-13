@@ -1,6 +1,6 @@
-import {EventEmitter} from 'fbemitter'
+import { EventEmitter } from 'fbemitter'
 
-class RobotStore{
+class RobotStore {
 	constructor(){
 		this.robots = [{
 			id : 1,
@@ -18,7 +18,7 @@ class RobotStore{
 	addRobot(r){
 		let maxId = this.robots.map((e) => e.id).reduce((a, e) => a > e ? a : e, 1)
 		r.id = maxId + 1
-		this.robots.push(r)
+		this.robots = [...this.robots, r]
 		this.emitter.emit('UPDATE')
 	}
 	getRobots(){
@@ -26,4 +26,6 @@ class RobotStore{
 	}
 }
 
-export default RobotStore
+const store = new RobotStore()
+
+export default store
